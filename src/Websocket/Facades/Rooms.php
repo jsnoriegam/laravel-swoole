@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getClients($room)
  * @method static array getRooms($fd)
  *
- * @see \SwooleTW\Http\Websocket\Rooms\RoomContract
+ * @see \SwooleTW\Http\Websocket\Rooms\RoomsContract
  */
-class Room extends Facade
+class Rooms extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -22,6 +22,6 @@ class Room extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'swoole.room';
+        return 'swoole.rooms';
     }
 }

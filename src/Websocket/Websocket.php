@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use SwooleTW\Http\Server\Facades\Server;
 use SwooleTW\Http\Server\Manager;
-use SwooleTW\Http\Websocket\Rooms\RoomContract;
+use SwooleTW\Http\Websocket\Rooms\RoomsContract;
 
 /**
  * Class Websocket
@@ -67,7 +67,7 @@ class Websocket
     /**
      * Room adapter.
      *
-     * @var \SwooleTW\Http\Websocket\Rooms\RoomContract
+     * @var \SwooleTW\Http\Websocket\Rooms\RoomsContract
      */
     protected $room;
 
@@ -81,10 +81,10 @@ class Websocket
     /**
      * Websocket constructor.
      *
-     * @param  \SwooleTW\Http\Websocket\Rooms\RoomContract  $room
+     * @param  \SwooleTW\Http\Websocket\Rooms\RoomsContract  $room
      * @param  \Illuminate\Contracts\Pipeline\Pipeline  $pipeline
      */
-    public function __construct(RoomContract $room, PipelineContract $pipeline)
+    public function __construct(RoomsContract $room, PipelineContract $pipeline)
     {
         $this->room = $room;
         $this->setPipeline($pipeline);
@@ -132,7 +132,7 @@ class Websocket
     {
         $rooms = is_string($rooms) || is_integer($rooms) ? func_get_args() : $rooms;
 
-        $this->room->add($this->sender, $rooms);
+        $this->room->subscribe($this->sender, $rooms);
 
         return $this;
     }
@@ -148,7 +148,7 @@ class Websocket
     {
         $rooms = is_string($rooms) || is_integer($rooms) ? func_get_args() : $rooms;
 
-        $this->room->delete($this->sender, $rooms);
+        $this->room->unsubscribe($this->sender, $rooms);
 
         return $this;
     }

@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Config;
 use SwooleTW\Http\Websocket\Websocket;
 use SwooleTW\Http\Server\Facades\Server;
 use SwooleTW\Http\Websocket\HandlerContract;
-use SwooleTW\Http\Websocket\Rooms\TableRoom;
-use SwooleTW\Http\Websocket\Rooms\RoomContract;
+use SwooleTW\Http\Websocket\Rooms\TableRooms;
+use SwooleTW\Http\Websocket\Rooms\RoomsContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use SwooleTW\Http\Websocket\SocketIO\SocketIOParser;
 use SwooleTW\Http\Websocket\SocketIO\WebsocketHandler;
@@ -57,7 +57,7 @@ class ManagerTest extends TestCase
             'client_rows' => 10,
             'client_size' => 10,
         ],
-        'swoole_websocket.drivers.table' => TableRoom::class,
+        'swoole_websocket.drivers.table' => TableRooms::class,
         'swoole_http.tables' => [],
         'swoole_http.providers' => [],
         'swoole_http.resetters' => [],
@@ -151,7 +151,7 @@ class ManagerTest extends TestCase
         $app = $manager->getApplication();
         $this->assertTrue($app->make(Sandbox::class) instanceof Sandbox);
         $this->assertTrue($app->make('swoole.table') instanceof SwooleTable);
-        $this->assertTrue($app->make('swoole.room') instanceof RoomContract);
+        $this->assertTrue($app->make('swoole.rooms') instanceof RoomsContract);
         $this->assertTrue($app->make(Websocket::class) instanceof Websocket);
     }
 

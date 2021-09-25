@@ -3,6 +3,7 @@
 namespace SwooleTW\Http\Server;
 
 use Exception;
+use ParseError;
 use Throwable;
 use Swoole\Process;
 use Swoole\Server\Task;
@@ -24,6 +25,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use SwooleTW\Http\Concerns\InteractsWithSwooleQueue;
 use SwooleTW\Http\Concerns\InteractsWithSwooleTable;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use TypeError;
 
 /**
  * Class Manager
@@ -38,7 +40,7 @@ class Manager
     /**
      * Container.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var Container
      */
     protected $container;
 
@@ -50,14 +52,14 @@ class Manager
     /**
      * @var string
      */
-    protected $basePath;
+    protected string $basePath;
 
     /**
      * Server events.
      *
      * @var array
      */
-    protected $events = [
+    protected array $events = [
         'start',
         'shutDown',
         'workerStart',
@@ -77,13 +79,13 @@ class Manager
     /**
      * HTTP server manager constructor.
      *
-     * @param \Illuminate\Contracts\Container\Container $container
-     * @param string $framework
-     * @param string $basePath
+     * @param  Container  $container
+     * @param  string  $framework
+     * @param  string|null  $basePath
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function __construct(Container $container, $framework, $basePath = null)
+    public function __construct(Container $container, string $framework, ?string $basePath)
     {
         $this->container = $container;
         $this->setFramework($framework);
@@ -166,7 +168,7 @@ class Manager
      *
      * @param \Swoole\Http\Server|mixed $server
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function onWorkerStart($server)
     {
@@ -259,7 +261,7 @@ class Manager
      * Set onTask listener.
      *
      * @param mixed $server
-     * @param string|\Swoole\Server\Task $taskId or $task
+     * @param string|Task  $taskId or $task
      * @param string|null $srcWorkerId
      * @param mixed|null $data
      */
@@ -375,7 +377,7 @@ class Manager
     /**
      * Add process to http server
      *
-     * @param \Swoole\Process $process
+     * @param  Process  $process
      */
     public function addProcess(Process $process): void
     {
@@ -395,7 +397,7 @@ class Manager
     /**
      * Log server error.
      *
-     * @param \Throwable|\Exception $e
+     * @param  Throwable|Exception  $e
      */
     public function logServerError(Throwable $e)
     {
@@ -414,14 +416,14 @@ class Manager
     /**
      * Normalize a throwable/exception to exception.
      *
-     * @param \Throwable|\Exception $e
+     * @param  Throwable|Exception  $e
      */
     protected function normalizeException(Throwable $e)
     {
         if (! $e instanceof Exception) {
-            if ($e instanceof \ParseError) {
+            if ($e instanceof ParseError) {
                 $severity = E_PARSE;
-            } elseif ($e instanceof \TypeError) {
+            } elseif ($e instanceof TypeError) {
                 $severity = E_RECOVERABLE_ERROR;
             } else {
                 $severity = E_ERROR;

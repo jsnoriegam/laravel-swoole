@@ -2,7 +2,7 @@
 
 namespace SwooleTW\Http\Websocket\Rooms;
 
-interface RoomContract
+interface RoomsContract
 {
     /**
      * Rooms key
@@ -21,25 +21,25 @@ interface RoomContract
     /**
      * Do some init stuffs before workers started.
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\RoomContract
+     * @return \SwooleTW\Http\Websocket\Rooms\RoomsContract
      */
-    public function prepare(): RoomContract;
+    public function prepare(): RoomsContract;
 
     /**
      * Add multiple socket fds to a room.
      *
      * @param int fd
-     * @param array|string rooms
+     * @param string room
      */
-    public function add(int $fd, $rooms);
+    public function subscribe(int $fd, string $room);
 
     /**
      * Delete multiple socket fds from a room.
      *
      * @param int fd
-     * @param array|string rooms
+     * @param string room
      */
-    public function delete(int $fd, $rooms);
+    public function unsubscribe(int $fd, string $room);
 
     /**
      * Get all sockets by a room key.

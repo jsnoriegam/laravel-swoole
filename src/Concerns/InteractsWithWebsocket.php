@@ -13,7 +13,7 @@ use SwooleTW\Http\Server\Facades\Server;
 use SwooleTW\Http\Websocket\HandlerContract;
 use Illuminate\Contracts\Container\Container;
 use Swoole\WebSocket\Server as WebsocketServer;
-use SwooleTW\Http\Websocket\Rooms\RoomContract;
+use SwooleTW\Http\Websocket\Rooms\RoomsContract;
 use SwooleTW\Http\Exceptions\WebsocketNotSetInConfigException;
 
 /**
@@ -41,7 +41,7 @@ trait InteractsWithWebsocket
     protected $payloadParser;
 
     /**
-     * @var \SwooleTW\Http\Websocket\Rooms\RoomContract
+     * @var \SwooleTW\Http\Websocket\Rooms\RoomsContract
      */
     protected $websocketRoom;
 
@@ -336,9 +336,9 @@ trait InteractsWithWebsocket
      * @param string $class
      * @param array $settings
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\RoomContract
+     * @return \SwooleTW\Http\Websocket\Rooms\RoomsContract
      */
-    protected function createRoom(string $class, array $settings): RoomContract
+    protected function createRoom(string $class, array $settings): RoomsContract
     {
         return new $class($settings);
     }
@@ -348,11 +348,11 @@ trait InteractsWithWebsocket
      */
     protected function bindRoom(): void
     {
-        $this->app->singleton(RoomContract::class, function () {
+        $this->app->singleton(RoomsContract::class, function () {
             return $this->websocketRoom;
         });
 
-        $this->app->alias(RoomContract::class, 'swoole.room');
+        $this->app->alias(RoomsContract::class, 'swoole.rooms');
     }
 
     /**
@@ -361,7 +361,7 @@ trait InteractsWithWebsocket
     protected function bindWebsocket()
     {
         $this->app->singleton(Websocket::class, function (Container $app) {
-            return new Websocket($app->make(RoomContract::class), new Pipeline($app));
+            return new Websocket($app->make(RoomsContract::class), new Pipeline($app));
         });
 
         $this->app->alias(Websocket::class, 'swoole.websocket');

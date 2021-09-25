@@ -2,9 +2,10 @@
 
 namespace SwooleTW\Http\Websocket\Rooms;
 
+use InvalidArgumentException;
 use Swoole\Table;
 
-class TableRoom implements RoomContract
+class TableRooms implements RoomsContract
 {
     /**
      * @var array
@@ -12,19 +13,14 @@ class TableRoom implements RoomContract
     protected $config;
 
     /**
-     * @var \Swoole\Table
+     * @var Table
      */
-    protected $rooms;
+    protected Table $fds, $rooms, $online_users;
 
     /**
-     * @var \Swoole\Table
-     */
-    protected $fds;
-
-    /**
-     * TableRoom constructor.
+     * TableRooms constructor.
      *
-     * @param array $config
+     * @param  array  $config
      */
     public function __construct(array $config)
     {
@@ -34,9 +30,9 @@ class TableRoom implements RoomContract
     /**
      * Do some init stuffs before workers started.
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\RoomContract
+     * @return RoomsContract
      */
-    public function prepare(): RoomContract
+    public function prepare(): RoomsContract
     {
         $this->initRoomsTable();
         $this->initFdsTable();
@@ -47,10 +43,10 @@ class TableRoom implements RoomContract
     /**
      * Add a socket fd to multiple rooms.
      *
-     * @param int fd
-     * @param array|string rooms
+     * @param  int fd
+     * @param  array|string rooms
      */
-    public function add(int $fd, $roomNames)
+    public function subscribe(int $fd, $room)
     {
         $rooms = $this->getRooms($fd);
         $roomNames = is_array($roomNames) ? $roomNames : [$roomNames];
@@ -74,10 +70,10 @@ class TableRoom implements RoomContract
     /**
      * Delete a socket fd from multiple rooms.
      *
-     * @param int fd
-     * @param array|string rooms
+     * @param  int fd
+     * @param  array|string rooms
      */
-    public function delete(int $fd, $roomNames = [])
+    public function unsubscribe(int $fd, $roomNames = [])
     {
         $allRooms = $this->getRooms($fd);
         $roomNames = is_array($roomNames) ? $roomNames : [$roomNames];
@@ -87,7 +83,7 @@ class TableRoom implements RoomContract
         foreach ($rooms as $room) {
             $fds = $this->getClients($room);
 
-            if (! in_array($fd, $fds)) {
+            if (!in_array($fd, $fds)) {
                 continue;
             }
 
@@ -101,47 +97,47 @@ class TableRoom implements RoomContract
     /**
      * Get all sockets by a room key.
      *
-     * @param string room
+     * @param  string room
      *
      * @return array
      */
     public function getClients(string $room)
     {
-        return $this->getValue($room, RoomContract::ROOMS_KEY) ?? [];
+        return $this->getValue($room, RoomsContract::ROOMS_KEY) ?? [];
     }
 
     /**
      * Get all rooms by a fd.
      *
-     * @param int fd
+     * @param  int fd
      *
      * @return array
      */
     public function getRooms(int $fd)
     {
-        return $this->getValue($fd, RoomContract::DESCRIPTORS_KEY) ?? [];
+        return $this->getValue($fd, RoomsContract::DESCRIPTORS_KEY) ?? [];
     }
 
     /**
-     * @param string $room
-     * @param array $fds
+     * @param  string  $room
+     * @param  array  $fds
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\TableRoom
+     * @return TableRooms
      */
-    protected function setClients(string $room, array $fds): TableRoom
+    protected function setClients(string $room, array $fds): TableRooms
     {
-        return $this->setValue($room, $fds, RoomContract::ROOMS_KEY);
+        return $this->setValue($room, $fds, RoomsContract::ROOMS_KEY);
     }
 
     /**
-     * @param int $fd
-     * @param array $rooms
+     * @param  int  $fd
+     * @param  array  $rooms
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\TableRoom
+     * @return TableRooms
      */
-    protected function setRooms(int $fd, array $rooms): TableRoom
+    protected function setRooms(int $fd, array $rooms): TableRooms
     {
-        return $this->setValue($fd, $rooms, RoomContract::DESCRIPTORS_KEY);
+        return $this->setValue($fd, $rooms, RoomsContract::DESCRIPTORS_KEY);
     }
 
     /**
@@ -168,8 +164,8 @@ class TableRoom implements RoomContract
      * Set value to table
      *
      * @param $key
-     * @param array $value
-     * @param string $table
+     * @param  array  $value
+     * @param  string  $table
      *
      * @return $this
      */
@@ -185,8 +181,8 @@ class TableRoom implements RoomContract
     /**
      * Get value from table
      *
-     * @param string $key
-     * @param string $table
+     * @param  string  $key
+     * @param  string  $table
      *
      * @return array|mixed
      */
@@ -202,12 +198,12 @@ class TableRoom implements RoomContract
     /**
      * Check table for exists
      *
-     * @param string $table
+     * @param  string  $table
      */
     protected function checkTable(string $table)
     {
-        if (! property_exists($this, $table) || ! $this->$table instanceof Table) {
-            throw new \InvalidArgumentException("Invalid table name: `{$table}`.");
+        if (!property_exists($this, $table) || !$this->$table instanceof Table) {
+            throw new InvalidArgumentException("Invalid table name: `{$table}`.");
         }
     }
 }

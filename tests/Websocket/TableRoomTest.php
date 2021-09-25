@@ -4,8 +4,8 @@ namespace SwooleTW\Http\Tests\Websocket;
 
 use Swoole\Table;
 use SwooleTW\Http\Tests\TestCase;
-use SwooleTW\Http\Websocket\Rooms\RoomContract;
-use SwooleTW\Http\Websocket\Rooms\TableRoom;
+use SwooleTW\Http\Websocket\Rooms\RoomsContract;
+use SwooleTW\Http\Websocket\Rooms\TableRooms;
 
 class TableRoomTest extends TestCase
 {
@@ -19,7 +19,7 @@ class TableRoomTest extends TestCase
             'client_rows' => 8192,
             'client_size' => 2048,
         ];
-        $this->tableRoom = new TableRoom($config);
+        $this->tableRoom = new TableRooms($config);
         $this->tableRoom->prepare();
     }
 
@@ -48,54 +48,54 @@ class TableRoomTest extends TestCase
 
     public function testSetValue()
     {
-        $this->tableRoom->setValue($key = 1, $value = ['foo', 'bar'], $table = RoomContract::DESCRIPTORS_KEY);
+        $this->tableRoom->setValue($key = 1, $value = ['foo', 'bar'], $table = RoomsContract::DESCRIPTORS_KEY);
 
         $this->assertSame($value, $this->tableRoom->getValue($key, $table));
     }
 
     public function testAddAll()
     {
-        $this->tableRoom->add($key = 1, $values = ['foo', 'bar']);
+        $this->tableRoom->subscribe($key = 1, $values = ['foo', 'bar']);
 
-        $this->assertSame($values, $this->tableRoom->getValue($key, $table = RoomContract::DESCRIPTORS_KEY));
-        $this->assertSame([$key], $this->tableRoom->getValue('foo', RoomContract::ROOMS_KEY));
-        $this->assertSame([$key], $this->tableRoom->getValue('bar', RoomContract::ROOMS_KEY));
+        $this->assertSame($values, $this->tableRoom->getValue($key, $table = RoomsContract::DESCRIPTORS_KEY));
+        $this->assertSame([$key], $this->tableRoom->getValue('foo', RoomsContract::ROOMS_KEY));
+        $this->assertSame([$key], $this->tableRoom->getValue('bar', RoomsContract::ROOMS_KEY));
     }
 
     public function testAdd()
     {
-        $this->tableRoom->add($key = 1, $value = 'foo');
+        $this->tableRoom->subscribe($key = 1, $value = 'foo');
 
-        $this->assertSame([$value], $this->tableRoom->getValue($key, $table = RoomContract::DESCRIPTORS_KEY));
-        $this->assertSame([$key], $this->tableRoom->getValue($value, RoomContract::ROOMS_KEY));
+        $this->assertSame([$value], $this->tableRoom->getValue($key, $table = RoomsContract::DESCRIPTORS_KEY));
+        $this->assertSame([$key], $this->tableRoom->getValue($value, RoomsContract::ROOMS_KEY));
     }
 
     public function testDeleteAll()
     {
-        $this->tableRoom->add($key = 1, $values = ['foo', 'bar']);
-        $this->tableRoom->delete($key);
+        $this->tableRoom->subscribe($key = 1, $values = ['foo', 'bar']);
+        $this->tableRoom->unsubscribe($key);
 
-        $this->assertSame([], $this->tableRoom->getValue($key, $table = RoomContract::DESCRIPTORS_KEY));
-        $this->assertSame([], $this->tableRoom->getValue('foo', RoomContract::ROOMS_KEY));
-        $this->assertSame([], $this->tableRoom->getValue('bar', RoomContract::ROOMS_KEY));
+        $this->assertSame([], $this->tableRoom->getValue($key, $table = RoomsContract::DESCRIPTORS_KEY));
+        $this->assertSame([], $this->tableRoom->getValue('foo', RoomsContract::ROOMS_KEY));
+        $this->assertSame([], $this->tableRoom->getValue('bar', RoomsContract::ROOMS_KEY));
     }
 
     public function testDelete()
     {
-        $this->tableRoom->add($key = 1, $values = ['foo', 'bar']);
-        $this->tableRoom->delete($key, 'foo');
+        $this->tableRoom->subscribe($key = 1, $values = ['foo', 'bar']);
+        $this->tableRoom->unsubscribe($key, 'foo');
 
-        $this->assertSame(['bar'], $this->tableRoom->getValue($key, $table = RoomContract::DESCRIPTORS_KEY));
-        $this->assertSame([], $this->tableRoom->getValue('foo', RoomContract::ROOMS_KEY));
-        $this->assertSame([$key], $this->tableRoom->getValue('bar', RoomContract::ROOMS_KEY));
+        $this->assertSame(['bar'], $this->tableRoom->getValue($key, $table = RoomsContract::DESCRIPTORS_KEY));
+        $this->assertSame([], $this->tableRoom->getValue('foo', RoomsContract::ROOMS_KEY));
+        $this->assertSame([$key], $this->tableRoom->getValue('bar', RoomsContract::ROOMS_KEY));
     }
 
     public function testGetRooms()
     {
-        $this->tableRoom->add($key = 1, $values = ['foo', 'bar']);
+        $this->tableRoom->subscribe($key = 1, $values = ['foo', 'bar']);
 
         $this->assertSame(
-            $this->tableRoom->getValue($key, $table = RoomContract::DESCRIPTORS_KEY),
+            $this->tableRoom->getValue($key, $table = RoomsContract::DESCRIPTORS_KEY),
             $this->tableRoom->getRooms($key)
         );
     }
@@ -103,11 +103,11 @@ class TableRoomTest extends TestCase
     public function testGetClients()
     {
         $keys = [1, 2];
-        $this->tableRoom->add($keys[0], $room = 'foo');
-        $this->tableRoom->add($keys[1], $room);
+        $this->tableRoom->subscribe($keys[0], $room = 'foo');
+        $this->tableRoom->subscribe($keys[1], $room);
 
         $this->assertSame(
-            $this->tableRoom->getValue($room, $table = RoomContract::ROOMS_KEY),
+            $this->tableRoom->getValue($room, $table = RoomsContract::ROOMS_KEY),
             $this->tableRoom->getClients($room)
         );
     }

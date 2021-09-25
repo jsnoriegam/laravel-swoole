@@ -5,7 +5,7 @@ namespace SwooleTW\Http\Tests\Websocket;
 use Mockery as m;
 use Predis\Client as RedisClient;
 use SwooleTW\Http\Tests\TestCase;
-use SwooleTW\Http\Websocket\Rooms\RedisRoom;
+use SwooleTW\Http\Websocket\Rooms\RedisRooms;
 
 class RedisRoomTest extends TestCase
 {
@@ -19,7 +19,7 @@ class RedisRoomTest extends TestCase
               ->with($keys)
               ->once();
 
-        $redisRoom = new RedisRoom([]);
+        $redisRoom = new RedisRooms([]);
         $redisRoom->prepare($redis);
 
         $this->assertTrue($redisRoom->getRedis() instanceOf RedisClient);
@@ -51,7 +51,7 @@ class RedisRoomTest extends TestCase
               ->times(3);
         $redisRoom = $this->getRedisRoom($redis);
 
-        $redisRoom->add(1, ['foo', 'bar']);
+        $redisRoom->subscribe(1, ['foo', 'bar']);
     }
 
     public function testAdd()
@@ -61,7 +61,7 @@ class RedisRoomTest extends TestCase
               ->twice();
         $redisRoom = $this->getRedisRoom($redis);
 
-        $redisRoom->add(1, 'foo');
+        $redisRoom->subscribe(1, 'foo');
     }
 
     public function testDeleteAll()
@@ -71,7 +71,7 @@ class RedisRoomTest extends TestCase
               ->times(3);
         $redisRoom = $this->getRedisRoom($redis);
 
-        $redisRoom->delete(1, ['foo', 'bar']);
+        $redisRoom->unsubscribe(1, ['foo', 'bar']);
     }
 
     public function testDelete()
@@ -81,7 +81,7 @@ class RedisRoomTest extends TestCase
               ->twice();
         $redisRoom = $this->getRedisRoom($redis);
 
-        $redisRoom->delete(1, 'foo');
+        $redisRoom->unsubscribe(1, 'foo');
     }
 
     public function testGetRooms()
@@ -108,7 +108,7 @@ class RedisRoomTest extends TestCase
 
     protected function getRedisRoom($redis = null)
     {
-        $redisRoom = new RedisRoom([]);
+        $redisRoom = new RedisRooms([]);
         $redisRoom->setRedis($redis ?: $this->getRedis());
 
         return $redisRoom;

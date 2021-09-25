@@ -8,7 +8,7 @@ use InvalidArgumentException;
 /**
  * Trait Authenticatable
  *
- * @property-read \SwooleTW\Http\Websocket\Rooms\RoomContract $room
+ * @property-read \SwooleTW\Http\Websocket\Rooms\RoomsContract $room
  */
 trait Authenticatable
 {
