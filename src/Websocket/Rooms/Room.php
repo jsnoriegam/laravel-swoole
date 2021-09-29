@@ -16,9 +16,9 @@ class Room implements Arrayable, JsonSerializable
 
     public function __construct(public int $id, public ?int $limit)
     {
-        $this->rooms = app('swoole.table')->make()->get('rooms');
-        $this->onlineUsers = SwooleTable::get('online_users');
-        $this->roomFds = SwooleTable::get('room_fds');
+        $this->rooms = \App::make('swoole.table')->get('rooms');
+        $this->onlineUsers = \App::make('swoole.table')->get('online_users');
+        $this->roomFds = \App::make('swoole.table')->get('room_fds');
     }
 
     public function get($filter): array
