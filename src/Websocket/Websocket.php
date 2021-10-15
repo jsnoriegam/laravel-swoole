@@ -37,7 +37,7 @@ class Websocket
     protected $sender;
 
     /**
-     * Recepient's fd or room name.
+     * Recipient's fd or room name.
      *
      * @var array
      */

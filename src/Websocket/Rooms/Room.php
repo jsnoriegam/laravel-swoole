@@ -6,7 +6,6 @@ use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use Swoole\Table;
-use SwooleTW\Http\Table\SwooleTable;
 
 class Room implements Arrayable, JsonSerializable
 {
@@ -16,9 +15,11 @@ class Room implements Arrayable, JsonSerializable
 
     public function __construct(public int $id, public ?int $limit)
     {
-        $this->rooms = \App::make('swoole.table')->get('rooms');
-        $this->onlineUsers = \App::make('swoole.table')->get('online_users');
-        $this->roomFds = \App::make('swoole.table')->get('room_fds');
+        /** @var $tables Table */
+        $tables = app('swoole.table');
+        $this->rooms = $tables->get('rooms');
+        $this->onlineUsers = $tables->get('online_users');
+        $this->roomFds = $tables->get('room_fds');
     }
 
     public function get($filter): array
@@ -113,11 +114,9 @@ class Room implements Arrayable, JsonSerializable
 
     public function toArray()
     {
-
     }
 
     public function jsonSerialize()
     {
-
     }
 }
