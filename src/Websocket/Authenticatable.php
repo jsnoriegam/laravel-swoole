@@ -14,6 +14,8 @@ trait Authenticatable
 {
     protected $userId;
 
+    protected array $fds = [];
+
     /**
      * Login using current user.
      *
@@ -96,8 +98,10 @@ trait Authenticatable
      */
     public function getUserId()
     {
-        if (! is_null($this->userId)) {
-            return $this->userId;
+        if (isset($this->fds[$this->sender])) {
+            return $this->fds[$this->sender];
+        }else{
+            //try to read from swoole table
         }
 
         $rooms = $this->room->getRooms($this->getSender());
