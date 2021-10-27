@@ -183,19 +183,27 @@ class Request
     {
         $uri = $swooleRequest->server['request_uri'] ?? '';
         $extension = strtok(pathinfo($uri, PATHINFO_EXTENSION), '?');
-        $fileName = $publicPath . $uri;
+        $filePath = @realpath($publicPath . $uri);
+
+        if (!$filePath) {
+            return false;
+        }
 
         if ($extension && in_array($extension, static::EXTENSION_BLACKLIST)) {
             return false;
         }
 
-        if (! is_file($fileName) || ! filesize($fileName)) {
+        if (substr($filePath, 0, strlen($publicPath)) != $publicPath) {
+            return false;
+        }
+
+        if (! is_file($filePath) || ! filesize($filePath)) {
             return false;
         }
 
         $swooleResponse->status(IlluminateResponse::HTTP_OK);
         $swooleResponse->header('Content-Type', MimeType::get($extension));
-        $swooleResponse->sendfile($fileName);
+        $swooleResponse->sendfile($filePath);
 
         return true;
     }
