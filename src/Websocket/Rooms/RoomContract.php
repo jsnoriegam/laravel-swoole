@@ -26,7 +26,7 @@ interface RoomContract
     public function prepare(): RoomContract;
 
     /**
-     * Add multiple socket fds to a room.
+     * Add a socket fd to multiple rooms.
      *
      * @param int fd
      * @param array|string rooms
@@ -34,7 +34,7 @@ interface RoomContract
     public function add(int $fd, $rooms);
 
     /**
-     * Delete multiple socket fds from a room.
+     * Delete a socket fd from multiple rooms.
      *
      * @param int fd
      * @param array|string rooms

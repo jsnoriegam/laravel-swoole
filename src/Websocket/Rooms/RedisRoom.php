@@ -91,7 +91,7 @@ class RedisRoom implements RoomContract
     }
 
     /**
-     * Add multiple socket fds to a room.
+     * Add a socket fd to multiple rooms.
      *
      * @param int fd
      * @param array|string rooms
@@ -108,7 +108,7 @@ class RedisRoom implements RoomContract
     }
 
     /**
-     * Delete multiple socket fds from a room.
+     * Delete a socket fd from multiple rooms.
      *
      * @param int fd
      * @param array|string rooms
