@@ -28,23 +28,23 @@ interface RoomContract
     /**
      * Add a socket fd to multiple rooms.
      *
-     * @param int fd
-     * @param array|string rooms
+     * @param int $fd
+     * @param array|string $rooms
      */
     public function add(int $fd, $rooms);
 
     /**
      * Delete a socket fd from multiple rooms.
      *
-     * @param int fd
-     * @param array|string rooms
+     * @param int $fd
+     * @param array|string $rooms
      */
     public function delete(int $fd, $rooms);
 
     /**
      * Get all sockets by a room key.
      *
-     * @param string room
+     * @param string $room
      *
      * @return array
      */
@@ -53,7 +53,7 @@ interface RoomContract
     /**
      * Get all rooms by a fd.
      *
-     * @param int fd
+     * @param int $fd
      *
      * @return array
      */
