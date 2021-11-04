@@ -223,12 +223,11 @@ class PDO extends BasePDO
     /**
      * @param string $statement
      * @param int $mode
-     * @param mixed $arg3
-     * @param array $ctorargs
+     * @param array $fetchModeArgs
      *
      * @return array|bool|false|\PDOStatement
      */
-    public function query($statement, $mode = PDO::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, array $ctorargs = [])
+    public function query($statement, $mode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetchModeArgs)
     {
         $result = $this->client->query($statement, Arr::get(self::$options, 'timeout'));
 
