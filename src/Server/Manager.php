@@ -59,22 +59,23 @@ class Manager
      *
      * @var array
      */
-    protected array $events = [
-        'start',
-        'shutDown',
-        'workerStart',
-        'workerStop',
-        'packet',
-        'bufferFull',
-        'bufferEmpty',
-        'task',
-        'finish',
-        'pipeMessage',
-        'workerError',
-        'managerStart',
-        'managerStop',
-        'request',
-    ];
+    protected array $events
+        = [
+            'start',
+            'shutDown',
+            'workerStart',
+            'workerStop',
+            'packet',
+            'bufferFull',
+            'bufferEmpty',
+            'task',
+            'finish',
+            'pipeMessage',
+            'workerError',
+            'managerStart',
+            'managerStop',
+            'request',
+        ];
 
     /**
      * HTTP server manager constructor.
@@ -85,7 +86,7 @@ class Manager
      *
      * @throws Exception
      */
-    public function __construct(Container $container, string $framework, ?string $basePath)
+    public function __construct(Container $container, string $framework, ?string $basePath = null)
     {
         $this->container = $container;
         $this->setFramework($framework);
@@ -117,7 +118,7 @@ class Manager
         $this->createTables();
         $this->prepareWebsocket();
 
-        if (! $this->container->make(Server::class)->taskworker) {
+        if (!$this->container->make(Server::class)->taskworker) {
             $this->setSwooleServerListeners();
         }
     }
@@ -130,9 +131,11 @@ class Manager
         $server = $this->container->make(Server::class);
         foreach ($this->events as $event) {
             $listener = Str::camel("on_$event");
-            $callback = method_exists($this, $listener) ? [$this, $listener] : function () use ($event) {
-                $this->container->make('events')->dispatch("swoole.$event", func_get_args());
-            };
+            $callback = method_exists($this, $listener)
+                ? [$this, $listener]
+                : function () use ($event) {
+                    $this->container->make('events')->dispatch("swoole.$event", func_get_args());
+                };
 
             $server->on($event, $callback);
         }
@@ -166,7 +169,7 @@ class Manager
     /**
      * "onWorkerStart" listener.
      *
-     * @param \Swoole\Http\Server|mixed $server
+     * @param  \Swoole\Http\Server|mixed  $server
      *
      * @throws Exception
      */
@@ -197,8 +200,8 @@ class Manager
     /**
      * "onRequest" listener.
      *
-     * @param \Swoole\Http\Request $swooleRequest
-     * @param \Swoole\Http\Response $swooleResponse
+     * @param  \Swoole\Http\Request  $swooleRequest
+     * @param  \Swoole\Http\Response  $swooleResponse
      */
     public function onRequest($swooleRequest, $swooleResponse)
     {
@@ -260,10 +263,10 @@ class Manager
     /**
      * Set onTask listener.
      *
-     * @param mixed $server
-     * @param string|Task  $taskId or $task
-     * @param string|null $srcWorkerId
-     * @param mixed|null $data
+     * @param  mixed  $server
+     * @param  string|Task  $taskId  or $task
+     * @param  string|null  $srcWorkerId
+     * @param  mixed|null  $data
      */
     public function onTask($server, $task, $srcWorkerId = null, $data = null)
     {
@@ -281,7 +284,7 @@ class Manager
             // push websocket message
             if ($this->isWebsocketPushPayload($data)) {
                 $this->pushMessage($server, $data['data']);
-            // push async task to queue
+                // push async task to queue
             } elseif ($this->isAsyncTaskPayload($data)) {
                 (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
             }
@@ -293,9 +296,9 @@ class Manager
     /**
      * Set onFinish listener.
      *
-     * @param mixed $server
-     * @param string $taskId
-     * @param mixed $data
+     * @param  mixed  $server
+     * @param  string  $taskId
+     * @param  mixed  $data
      */
     public function onFinish($server, $taskId, $data)
     {
@@ -420,7 +423,7 @@ class Manager
      */
     protected function normalizeException(Throwable $e)
     {
-        if (! $e instanceof Exception) {
+        if (!$e instanceof Exception) {
             if ($e instanceof ParseError) {
                 $severity = E_PARSE;
             } elseif ($e instanceof TypeError) {
@@ -445,7 +448,7 @@ class Manager
     /**
      * Indicates if the payload is async task.
      *
-     * @param mixed $payload
+     * @param  mixed  $payload
      *
      * @return boolean
      */
