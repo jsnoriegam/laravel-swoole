@@ -293,7 +293,7 @@ class PDO extends BasePDO
             case \PDO::ATTR_SERVER_INFO:
                 return self::$options['timeout'];
             case \PDO::ATTR_SERVER_VERSION:
-                return 'Swoole Mysql';
+                return parent::getAttribute($attribute);
             case \PDO::ATTR_TIMEOUT:
             default:
                 throw new \InvalidArgumentException('Not implemented yet!');
