@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use SwooleTW\Http\Server\Facades\Server;
 use SwooleTW\Http\Server\Manager;
-use SwooleTW\Http\Websocket\Rooms\RoomsContract;
+use SwooleTW\Http\Websocket\Rooms\RoomContract;
 
 /**
  * Class Websocket
@@ -67,7 +67,7 @@ class Websocket
     /**
      * Room adapter.
      *
-     * @var \SwooleTW\Http\Websocket\Rooms\RoomsContract
+     * @var \SwooleTW\Http\Websocket\Rooms\RoomContract
      */
     protected $room;
 
@@ -81,10 +81,10 @@ class Websocket
     /**
      * Websocket constructor.
      *
-     * @param  \SwooleTW\Http\Websocket\Rooms\RoomsContract  $room
+     * @param  \SwooleTW\Http\Websocket\Rooms\RoomContract  $room
      * @param  \Illuminate\Contracts\Pipeline\Pipeline  $pipeline
      */
-    public function __construct(RoomsContract $room, PipelineContract $pipeline)
+    public function __construct(RoomContract $room, PipelineContract $pipeline)
     {
         $this->room = $room;
         $this->setPipeline($pipeline);

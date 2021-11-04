@@ -75,8 +75,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'drivers' => [
-        'table' => SwooleTW\Http\Websocket\Rooms\TableRooms::class,
-        'redis' => SwooleTW\Http\Websocket\Rooms\RedisRooms::class,
+        'table' => SwooleTW\Http\Websocket\Rooms\TableRoom::class,
+        'redis' => SwooleTW\Http\Websocket\Rooms\RedisRoom::class,
     ],
 
     /*

@@ -12,7 +12,7 @@ use Swoole\Table;
 /**
  * Trait Authenticatable
  *
- * @property-read \SwooleTW\Http\Websocket\Rooms\RoomsContract $room
+ * @property-read \SwooleTW\Http\Websocket\Rooms\RoomContract $room
  */
 trait Authenticatable
 {

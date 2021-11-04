@@ -5,7 +5,7 @@ namespace SwooleTW\Http\Websocket\Rooms;
 use InvalidArgumentException;
 use Swoole\Table;
 
-class TableRooms implements RoomsContract
+class TableRoom implements RoomContract
 {
     /**
      * @var array
@@ -30,9 +30,9 @@ class TableRooms implements RoomsContract
     /**
      * Do some init stuffs before workers started.
      *
-     * @return RoomsContract
+     * @return RoomContract
      */
-    public function prepare(): RoomsContract
+    public function prepare(): RoomContract
     {
         $this->initRoomsTable();
         $this->initFdsTable();
@@ -103,7 +103,7 @@ class TableRooms implements RoomsContract
      */
     public function getClients(string $room)
     {
-        return $this->getValue($room, RoomsContract::ROOMS_KEY) ?? [];
+        return $this->getValue($room, RoomContract::ROOMS_KEY) ?? [];
     }
 
     /**
@@ -115,29 +115,29 @@ class TableRooms implements RoomsContract
      */
     public function getRooms(int $fd)
     {
-        return $this->getValue($fd, RoomsContract::DESCRIPTORS_KEY) ?? [];
+        return $this->getValue($fd, RoomContract::DESCRIPTORS_KEY) ?? [];
     }
 
     /**
      * @param  string  $room
      * @param  array  $fds
      *
-     * @return TableRooms
+     * @return TableRoom
      */
-    protected function setClients(string $room, array $fds): TableRooms
+    protected function setClients(string $room, array $fds): TableRoom
     {
-        return $this->setValue($room, $fds, RoomsContract::ROOMS_KEY);
+        return $this->setValue($room, $fds, RoomContract::ROOMS_KEY);
     }
 
     /**
      * @param  int  $fd
      * @param  array  $rooms
      *
-     * @return TableRooms
+     * @return TableRoom
      */
-    protected function setRooms(int $fd, array $rooms): TableRooms
+    protected function setRooms(int $fd, array $rooms): TableRoom
     {
-        return $this->setValue($fd, $rooms, RoomsContract::DESCRIPTORS_KEY);
+        return $this->setValue($fd, $rooms, RoomContract::DESCRIPTORS_KEY);
     }
 
     /**

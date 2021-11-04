@@ -2,7 +2,7 @@
 
 namespace SwooleTW\Http\Websocket\Rooms;
 
-interface RoomsContract
+interface RoomContract
 {
     /**
      * Rooms key
@@ -21,9 +21,9 @@ interface RoomsContract
     /**
      * Do some init stuffs before workers started.
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\RoomsContract
+     * @return \SwooleTW\Http\Websocket\Rooms\RoomContract
      */
-    public function prepare(): RoomsContract;
+    public function prepare(): RoomContract;
 
     /**
      * Add multiple socket fds to a room.

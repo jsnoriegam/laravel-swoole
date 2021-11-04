@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getClients($room)
  * @method static array getRooms($fd)
  *
- * @see \SwooleTW\Http\Websocket\Rooms\RoomsContract
+ * @see \SwooleTW\Http\Websocket\Rooms\RoomContract
  */
 class Rooms extends Facade
 {

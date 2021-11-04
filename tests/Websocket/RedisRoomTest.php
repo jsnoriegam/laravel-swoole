@@ -5,7 +5,7 @@ namespace SwooleTW\Http\Tests\Websocket;
 use Mockery as m;
 use Predis\Client as RedisClient;
 use SwooleTW\Http\Tests\TestCase;
-use SwooleTW\Http\Websocket\Rooms\RedisRooms;
+use SwooleTW\Http\Websocket\Rooms\RedisRoom;
 
 class RedisRoomTest extends TestCase
 {
@@ -19,7 +19,7 @@ class RedisRoomTest extends TestCase
               ->with($keys)
               ->once();
 
-        $redisRoom = new RedisRooms([]);
+        $redisRoom = new RedisRoom([]);
         $redisRoom->prepare($redis);
 
         $this->assertTrue($redisRoom->getRedis() instanceOf RedisClient);
@@ -108,7 +108,7 @@ class RedisRoomTest extends TestCase
 
     protected function getRedisRoom($redis = null)
     {
-        $redisRoom = new RedisRooms([]);
+        $redisRoom = new RedisRoom([]);
         $redisRoom->setRedis($redis ?: $this->getRedis());
 
         return $redisRoom;

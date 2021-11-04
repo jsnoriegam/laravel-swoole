@@ -9,7 +9,7 @@ use Predis\Pipeline\Pipeline;
 /**
  * Class RedisRooms
  */
-class RedisRooms implements RoomsContract
+class RedisRoom implements RoomContract
 {
     /**
      * @var \Predis\Client
@@ -39,9 +39,9 @@ class RedisRooms implements RoomsContract
     /**
      * @param \Predis\Client|null $redis
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\RoomsContract
+     * @return \SwooleTW\Http\Websocket\Rooms\RoomContract
      */
-    public function prepare(RedisClient $redis = null): RoomsContract
+    public function prepare(RedisClient $redis = null): RoomContract
     {
         $this->setRedis($redis);
         $this->setPrefix();
@@ -100,10 +100,10 @@ class RedisRooms implements RoomsContract
     {
         $rooms = is_array($rooms) ? $rooms : [$rooms];
 
-        $this->addValue($fd, $rooms, RoomsContract::DESCRIPTORS_KEY);
+        $this->addValue($fd, $rooms, RoomContract::DESCRIPTORS_KEY);
 
         foreach ($rooms as $room) {
-            $this->addValue($room, [$fd], RoomsContract::ROOMS_KEY);
+            $this->addValue($room, [$fd], RoomContract::ROOMS_KEY);
         }
     }
 
@@ -118,10 +118,10 @@ class RedisRooms implements RoomsContract
         $rooms = is_array($rooms) ? $rooms : [$rooms];
         $rooms = count($rooms) ? $rooms : $this->getRooms($fd);
 
-        $this->removeValue($fd, $rooms, RoomsContract::DESCRIPTORS_KEY);
+        $this->removeValue($fd, $rooms, RoomContract::DESCRIPTORS_KEY);
 
         foreach ($rooms as $room) {
-            $this->removeValue($room, [$fd], RoomsContract::ROOMS_KEY);
+            $this->removeValue($room, [$fd], RoomContract::ROOMS_KEY);
         }
     }
 
@@ -180,7 +180,7 @@ class RedisRooms implements RoomsContract
      */
     public function getClients(string $room)
     {
-        return $this->getValue($room, RoomsContract::ROOMS_KEY) ?? [];
+        return $this->getValue($room, RoomContract::ROOMS_KEY) ?? [];
     }
 
     /**
@@ -192,7 +192,7 @@ class RedisRooms implements RoomsContract
      */
     public function getRooms(int $fd)
     {
-        return $this->getValue($fd, RoomsContract::DESCRIPTORS_KEY) ?? [];
+        return $this->getValue($fd, RoomContract::DESCRIPTORS_KEY) ?? [];
     }
 
     /**
@@ -202,7 +202,7 @@ class RedisRooms implements RoomsContract
      */
     protected function checkTable(string $table)
     {
-        if (! in_array($table, [RoomsContract::ROOMS_KEY, RoomsContract::DESCRIPTORS_KEY])) {
+        if (! in_array($table, [RoomContract::ROOMS_KEY, RoomContract::DESCRIPTORS_KEY])) {
             throw new \InvalidArgumentException("Invalid table name: `{$table}`.");
         }
     }
