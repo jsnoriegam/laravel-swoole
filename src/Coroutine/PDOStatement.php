@@ -28,7 +28,7 @@ class PDOStatement extends BaseStatement
 
     public $resultSet = [];
 
-    public $fetchStyle = PDO::FETCH_BOTH;
+    public $mode = PDO::FETCH_BOTH;
 
     public function __construct(PDO $parent, Statement $statement, array $driverOptions = [])
     {
@@ -120,9 +120,9 @@ class PDOStatement extends BaseStatement
         return $ok;
     }
 
-    public function setFetchMode($fetchStyle, ...$params)
+    public function setFetchMode($mode, ...$params)
     {
-        $this->fetchStyle = $fetchStyle;
+        $this->mode = $mode;
         return true;
     }
 
@@ -152,9 +152,8 @@ class PDOStatement extends BaseStatement
 
     private function transStyle(
         $rawData,
-        $fetchStyle = null,
-        $fetchArgument = null,
-        $ctorArgs = null
+        $mode = null,
+        $args = null
     ) {
         if (!is_array($rawData)) {
             return false;
@@ -163,18 +162,18 @@ class PDOStatement extends BaseStatement
             return $rawData;
         }
 
-        $fetchStyle = is_null($fetchStyle) ? $this->fetchStyle : $fetchStyle;
-        $ctorArgs = is_null($ctorArgs) ? [] : $ctorArgs;
+        $mode = is_null($mode) ? $this->mode : $mode;
+        $args = is_null($args) ? [] : $args;
 
         $resultSet = [];
-        switch ($fetchStyle) {
+        switch ($mode) {
             case PDO::FETCH_BOTH:
                 $resultSet = $this->transBoth($rawData);
                 break;
             case PDO::FETCH_COLUMN:
                 $resultSet = array_column(
-                    is_numeric($fetchArgument) ? $this->transBoth($rawData) : $rawData,
-                    $fetchArgument
+                    is_numeric($args[0]) ? $this->transBoth($rawData) : $rawData,
+                    $args[0]
                 );
                 break;
             case PDO::FETCH_OBJ:
@@ -196,7 +195,7 @@ class PDOStatement extends BaseStatement
     }
 
     public function fetch(
-        $fetchStyle = null,
+        $mode = null,
         $cursorOrientation = null,
         $cursorOffset = null,
         $fetchArgument = null
@@ -228,7 +227,7 @@ class PDOStatement extends BaseStatement
         if (empty($result)) {
             return $result;
         } else {
-            return $this->transStyle([$result], $fetchStyle, $fetchArgument)[0];
+            return $this->transStyle([$result], $mode, $fetchArgument)[0];
         }
     }
 
@@ -250,12 +249,10 @@ class PDOStatement extends BaseStatement
         return $this->fetch(PDO::FETCH_COLUMN, PDO::FETCH_ORI_NEXT, 0, $columnNumber);
     }
 
-    public function fetchAll($fetchStyle = null, ...$args): array
+    public function fetchAll($mode = null, ...$args): array
     {
         $this->__executeWhenStringQueryEmpty();
-        $fetchArgument = array_shift($args);
-        $ctorArgs = array_shift($args);
-        $resultSet = $this->transStyle($this->resultSet, $fetchStyle, $fetchArgument, $ctorArgs);
+        $resultSet = $this->transStyle($this->resultSet, $mode, $args);
         $this->resultSet = [];
 
         return $resultSet;
