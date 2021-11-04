@@ -54,7 +54,7 @@ class PDOStatement extends BaseStatement
 
     public function bindParam($parameter, &$variable, $type = null, $maxlen = null, $driverdata = null)
     {
-        if (! is_string($parameter) && ! is_int($parameter)) {
+        if (!is_string($parameter) && !is_int($parameter)) {
             return false;
         }
 
@@ -66,12 +66,12 @@ class PDOStatement extends BaseStatement
 
     public function bindValue($parameter, $variable, $type = null)
     {
-        if (! is_string($parameter) && ! is_int($parameter)) {
+        if (!is_string($parameter) && !is_int($parameter)) {
             return false;
         }
 
         if (is_object($variable)) {
-            if (! method_exists($variable, '__toString')) {
+            if (!method_exists($variable, '__toString')) {
                 return false;
             } else {
                 $variable = (string) $variable;
@@ -92,14 +92,14 @@ class PDOStatement extends BaseStatement
 
     public function execute($inputParameters = null)
     {
-        if (! empty($inputParameters)) {
+        if (!empty($inputParameters)) {
             foreach ($inputParameters as $key => $value) {
                 $this->bindParam($key, $value);
             }
         }
 
         $inputParameters = [];
-        if (! empty($this->statement->bindKeyMap)) {
+        if (!empty($this->statement->bindKeyMap)) {
             foreach ($this->statement->bindKeyMap as $nameKey => $numKey) {
                 if (isset($this->bindMap[$nameKey])) {
                     $inputParameters[$numKey] = $this->bindMap[$nameKey];
@@ -120,9 +120,10 @@ class PDOStatement extends BaseStatement
         return $ok;
     }
 
-    public function setFetchMode($fetchStyle, $params = null)
+    public function setFetchMode($fetchStyle, ...$params)
     {
         $this->fetchStyle = $fetchStyle;
+        return true;
     }
 
     private function __executeWhenStringQueryEmpty()
@@ -154,9 +155,8 @@ class PDOStatement extends BaseStatement
         $fetchStyle = null,
         $fetchArgument = null,
         $ctorArgs = null
-    )
-    {
-        if (! is_array($rawData)) {
+    ) {
+        if (!is_array($rawData)) {
             return false;
         }
         if (empty($rawData)) {
@@ -200,8 +200,7 @@ class PDOStatement extends BaseStatement
         $cursorOrientation = null,
         $cursorOffset = null,
         $fetchArgument = null
-    )
-    {
+    ) {
         $this->__executeWhenStringQueryEmpty();
 
         $cursorOrientation = is_null($cursorOrientation) ? PDO::FETCH_ORI_NEXT : $cursorOrientation;
@@ -251,9 +250,11 @@ class PDOStatement extends BaseStatement
         return $this->fetch(PDO::FETCH_COLUMN, PDO::FETCH_ORI_NEXT, 0, $columnNumber);
     }
 
-    public function fetchAll($fetchStyle = null, $fetchArgument = null, $ctorArgs = null)
+    public function fetchAll($fetchStyle = null, ...$args): array
     {
         $this->__executeWhenStringQueryEmpty();
+        $fetchArgument = array_shift($args);
+        $ctorArgs = array_shift($args);
         $resultSet = $this->transStyle($this->resultSet, $fetchStyle, $fetchArgument, $ctorArgs);
         $this->resultSet = [];
 
