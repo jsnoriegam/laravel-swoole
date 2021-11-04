@@ -2,8 +2,12 @@
 
 namespace SwooleTW\Http\Websocket;
 
+use http\Client\Curl\User;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Support\Facades\App;
 use InvalidArgumentException;
+use Swoole\Table;
 
 /**
  * Trait Authenticatable
@@ -12,6 +16,8 @@ use InvalidArgumentException;
  */
 trait Authenticatable
 {
+    protected $table_names = [];
+
     protected $userId;
 
     protected array $fds = [];
@@ -19,13 +25,28 @@ trait Authenticatable
     /**
      * Login using current user.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param  AuthenticatableContract  $user
      *
      * @return mixed
      */
     public function loginUsing(AuthenticatableContract $user)
     {
         return $this->loginUsingId($user->getAuthIdentifier());
+    }
+
+    /**
+     * Sets connection current user.
+     *
+     * @param  AuthenticatableContract  $user
+     *
+     * @return mixed
+     */
+    public function setUser(AuthenticatableContract $user)
+    {
+        /** @var Table $table */
+        $table = App::make('swoole.table')->get('online_users');
+        $table->set($this->sender, ['id' => $user->getAuthIdentifier(), 'fd' => $this->sender]);
+        return true;
     }
 
     /**
@@ -37,7 +58,7 @@ trait Authenticatable
      */
     public function loginUsingId($userId)
     {
-        return $this->join(static::USER_PREFIX . $userId);
+        return $this->join(static::USER_PREFIX.$userId);
     }
 
     /**
@@ -51,7 +72,7 @@ trait Authenticatable
             return null;
         }
 
-        return $this->leave(static::USER_PREFIX . $userId);
+        return $this->leave(static::USER_PREFIX.$userId);
     }
 
     /**
@@ -86,7 +107,7 @@ trait Authenticatable
         $userIds = is_string($userIds) || is_integer($userIds) ? func_get_args() : $userIds;
 
         foreach ($userIds as $userId) {
-            $fds = $this->room->getClients(static::USER_PREFIX . $userId);
+            $fds = $this->room->getClients(static::USER_PREFIX.$userId);
             $this->to($fds);
         }
 
@@ -100,19 +121,18 @@ trait Authenticatable
     {
         if (isset($this->fds[$this->sender])) {
             return $this->fds[$this->sender];
-        }else{
-            //try to read from swoole table
         }
+        $table = App::make('swoole.table')->get('online_users');
+        return $table->get($this->sender)['id'];
+    }
 
-        $rooms = $this->room->getRooms($this->getSender());
-
-        foreach ($rooms as $room) {
-            if (count($explode = explode(static::USER_PREFIX, $room)) === 2) {
-                $this->userId = $explode[1];
-            }
-        }
-
-        return $this->userId;
+    /**
+     * Get current auth user by sender's fd.
+     */
+    public function getUser(): ?AuthenticatableContract
+    {
+        $id = $this->getUserId();
+        return app(UserProvider::class)->retrieveById($id);
     }
 
     /**
@@ -124,7 +144,7 @@ trait Authenticatable
      */
     public function isUserIdOnline($userId)
     {
-        return ! empty($this->room->getClients(static::USER_PREFIX . $userId));
+        return !empty($this->room->getClients(static::USER_PREFIX.$userId));
     }
 
     /**
@@ -134,8 +154,8 @@ trait Authenticatable
      */
     protected function checkUser($user)
     {
-        if (! $user instanceOf AuthenticatableContract) {
-            throw new InvalidArgumentException('user object must implement ' . AuthenticatableContract::class);
+        if (!$user instanceof AuthenticatableContract) {
+            throw new InvalidArgumentException('user object must implement '.AuthenticatableContract::class);
         }
     }
 }
