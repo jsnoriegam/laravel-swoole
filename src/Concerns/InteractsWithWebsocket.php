@@ -83,7 +83,7 @@ trait InteractsWithWebsocket
 
         try {
             $websocket->reset(true)->setSender($swooleRequest->fd);
-            // set currnt request to sandbox
+            // set current request to sandbox
             $sandbox->setRequest($illuminateRequest);
             // enable sandbox
             $sandbox->enable();
